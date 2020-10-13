@@ -14,6 +14,8 @@ override=${4:-false}
 echo "inPattern = ${inPattern}"
 echo "outPattern = ${outPattern}"
 
+finalhaddchain=""
+
 haddchain=""
 if [ override ]
 then
@@ -31,7 +33,9 @@ do
   if [ ${nFiles} -ge ${maxNFiles} ] # if we've appended maxNFiles, then hadd them together
   then
     hadd ${outPattern}_${nHadds}.root ${haddchain}
+    finalhaddchain="${finalhaddchain} ${outPattern}_${nHadds}.root"
     nHadds=$(( ${nHadds}+1 ))       # increment nHadds counter
+
 
     nFiles=0                        # reset relevant variables
     if [ override ]
@@ -47,5 +51,11 @@ done
 if [ ${nFiles} -ge 1 ]
 then
   hadd ${outPattern}_${nHadds}.root ${haddchain}
+  finalhaddchain="${finalhaddchain} ${outPattern}_${nHadds}.root"
   nHadds=$(( ${nHadds}+1 ))
+fi
+
+if [ ${nHadds} -ge 1 ]
+then
+  hadd ${outPattern}_combined.root ${finalhaddchain}
 fi
